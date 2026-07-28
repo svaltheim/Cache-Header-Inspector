@@ -1,4 +1,6 @@
 # Cache-Header-Inspector
+![Python](https://img.shields.io/badge/python-3.x-blue.svg)
+
 A lightweight Python tool designed for Bug Bounty hunters to identify cacheable endpoints by inspecting HTTP response headers.
 
 The tool performs a warm-up request followed by a second probe request to detect cache HIT/MISS conditions across multiple CDN providers.
