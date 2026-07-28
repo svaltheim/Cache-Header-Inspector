@@ -40,6 +40,15 @@ Features
 
 <img width="1058" height="1043" alt="image" src="https://github.com/user-attachments/assets/3cff15a1-ad51-43eb-b674-26a8241644ff" />
 
+*****************************************************************************************************************************************************
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/svaltheim/Cache-Header-Inspector.git](https://github.com/svaltheim/Cache-Header-Inspector.git)
+   cd Cache-Header-Inspector
+
 
 
 
