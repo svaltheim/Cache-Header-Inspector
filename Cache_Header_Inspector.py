@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-HTTP Headers Inspector - Batch mode con detección de caché HIT
-Uso: python http_inspector.py <fichero_dominios> [fichero_salida]
+HTTP Headers Inspector - Batch mode with cache HIT detection
+Usage: python http_inspector.py <domains_file> [output_file]
 
-  fichero_dominios : fichero de texto con un dominio o URL por línea
-  fichero_salida   : opcional, por defecto "headers_result.txt"
+  domains_file : text file containing one domain or URL per line
+  output_file   : optional, default "headers_result.txt"
 
-Lógica:
-  - Petición 1 (warm-up) : calienta la caché, se descarta
-  - Petición 2 (probe)   : se guardan las cabeceras y se detecta HIT/MISS
+Workflow:
+  - Request 1 (warm-up): warms the cache and is discarded
+  - Request 2 (probe): headers are collected and HIT/MISS is detected
 
-CDNs soportados: Incapsula, Akamai, Fastly, Cloudflare, Varnish
+Supported CDNs: Incapsula, Akamai, Fastly, Cloudflare, Varnish
 """
 
 import sys
@@ -20,7 +20,7 @@ import urllib.error
 from datetime import datetime
 
 
-# ── Fingerprints para identificar el CDN ────────────────────────────────────
+# ── CDN fingerprints ────────────────────────────────────
 CDN_FINGERPRINTS = {
     "Incapsula":  ["x-iinfo", "x-cdn"],
     "Akamai":     ["x-check-cacheable", "akamai-cache-status", "x-akamai-cache-status"],
@@ -29,12 +29,12 @@ CDN_FINGERPRINTS = {
     "Varnish":    ["x-varnish", "x-varnish-cache"],
 }
 
-# ── Reglas de HIT por cabecera ───────────────────────────────────────────────
-# NOTA: x-iinfo (Incapsula) se usa SOLO para identificar el CDN, no para
-# detectar HIT. Siempre aparece en sus respuestas independientemente del
-# estado de cache, lo que provocaria falsos positivos.
+# ── Cache HIT detection rules ───────────────────────────────────────────────
+# NOTE: x-iinfo (Incapsula) is used ONLY to identify the CDN, no para
+# detect HIT. It is always present regardless of cache status,
+# which would generate false positives.
 CACHE_HIT_RULES = {
-    # Genericas
+    # Generic
     "x-cache":               lambda v: "hit" in v.lower(),
     "x-cache-status":        lambda v: "hit" in v.lower(),
 
@@ -61,7 +61,7 @@ CACHE_AGE_HEADER = "age"   # Age > 0 también indica HIT
 
 
 def detect_cdn(headers: dict) -> str:
-    """Intenta identificar el CDN/proxy a partir de las cabeceras."""
+    """Attempts to identify the CDN/proxy from the response headers."""
     lower_h = {k.lower() for k in headers}
     found = [cdn for cdn, fps in CDN_FINGERPRINTS.items() if any(fp in lower_h for fp in fps)]
     return ", ".join(found) if found else "Desconocido"
@@ -69,8 +69,8 @@ def detect_cdn(headers: dict) -> str:
 
 def detect_cache_status(headers: dict) -> tuple[bool, str]:
     """
-    Devuelve (is_hit, detalle) analizando las cabeceras de caché.
-    Cubre Incapsula, Akamai, Fastly, Cloudflare y Varnish.
+    Returns (is_hit, details) by analyzing cache headers.
+    Supports Incapsula, Akamai, Fastly, Cloudflare y Varnish.
     """
     lower_headers = {k.lower(): v for k, v in headers.items()}
 
@@ -91,11 +91,11 @@ def detect_cache_status(headers: dict) -> tuple[bool, str]:
     except ValueError:
         pass
 
-    return False, "MISS / no cacheado"
+    return False, "MISS / not cached"
 
 
 def fetch(url: str) -> tuple[dict, int, str, str]:
-    """Hace una petición HTTP y devuelve (headers, status, reason, final_url)."""
+    """Performs an HTTP request and returns (headers, status, reason, final_url)."""
     req = urllib.request.Request(
         url,
         headers={
@@ -110,10 +110,10 @@ def fetch(url: str) -> tuple[dict, int, str, str]:
 
 def probe_url(url: str) -> tuple[str, bool]:
     """
-    Hace dos peticiones a la URL:
-      1ª warm-up  → calienta la caché (se descarta)
-      2ª probe    → se analiza si hay HIT y se guardan las cabeceras
-    Devuelve (bloque_texto, is_hit).
+    Performs two requests to the URL:
+      1ª warm-up  → warms the cache (discarded)
+      2ª probe    → analyzes HIT/MISS and stores the headers
+    Returns (output_text, is_hit).
     """
     if not url.startswith(("http://", "https://")):
         url = "https://" + url
@@ -123,35 +123,35 @@ def probe_url(url: str) -> tuple[str, bool]:
 
     lines.append(f"{'='*62}")
     lines.append(f"  URL  : {url}")
-    lines.append(f"  Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"  Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(f"{'='*62}")
 
     try:
-        # Petición 1: warm-up
+        # Warm-up request
         fetch(url)
         time.sleep(0.5)
 
-        # Petición 2: probe
+        # Probe request
         headers, status, reason, final_url = fetch(url)
 
         cdn = detect_cdn(headers)
         is_hit, cache_detail = detect_cache_status(headers)
         cache_label = "HIT" if is_hit else "MISS"
 
-        lines.append(f"\n  Estado      : {status} {reason}")
+        lines.append(f"\n  Status      : {status} {reason}")
         lines.append(f"  CDN/Proxy   : {cdn}")
         lines.append(f"  Cache       : {cache_label}  ({cache_detail})")
         if final_url != url:
-            lines.append(f"  Redirigido a: {final_url}")
+            lines.append(f"  Redirected to: {final_url}")
 
         lines.append(f"\n{'─'*62}")
-        lines.append(f"  {'CABECERA':<40} VALOR")
+        lines.append(f"  {'HEADER':<40} VALUE")
         lines.append(f"{'─'*62}")
         for key, value in sorted(headers.items()):
             lines.append(f"  {key:<40} {value}")
 
     except urllib.error.HTTPError as e:
-        lines.append(f"\n  Estado : {e.code} {e.reason}")
+        lines.append(f"\n  Status : {e.code} {e.reason}")
         if e.headers:
             hdrs = dict(e.headers)
             cdn = detect_cdn(hdrs)
@@ -160,16 +160,16 @@ def probe_url(url: str) -> tuple[str, bool]:
             lines.append(f"  CDN/Proxy: {cdn}")
             lines.append(f"  Cache    : {cache_label}  ({cache_detail})")
             lines.append(f"\n{'─'*62}")
-            lines.append(f"  {'CABECERA':<40} VALOR")
+            lines.append(f"  {'HEADER':<40} VALUE")
             lines.append(f"{'─'*62}")
             for key, value in sorted(hdrs.items()):
                 lines.append(f"  {key:<40} {value}")
 
     except urllib.error.URLError as e:
-        lines.append(f"\n  Error de conexion: {e.reason}")
+        lines.append(f"\n  Connection error: {e.reason}")
 
     except Exception as e:
-        lines.append(f"\n  Error inesperado: {e}")
+        lines.append(f"\n  Unexpected error: {e}")
 
     lines.append(f"{'='*62}")
     return "\n".join(lines), is_hit
@@ -184,25 +184,25 @@ def process_file(input_file: str, output_file: str) -> None:
                 if line.strip() and not line.strip().startswith("#")
             ]
     except FileNotFoundError:
-        print(f"No se encontro el fichero: {input_file}")
+        print(f"File not found: {input_file}")
         sys.exit(1)
 
     if not domains:
-        print("El fichero esta vacio o no tiene dominios validos.")
+        print("The input file is empty or contains no valid domains.")
         sys.exit(1)
 
     total  = len(domains)
     hits   = 0
     misses = 0
 
-    print(f"Procesando {total} dominio(s) [2 peticiones por URL]...")
-    print(f"CDNs soportados: Incapsula, Akamai, Fastly, Cloudflare, Varnish")
-    print(f"Guardando resultados en: {output_file}\n")
+    print(f"Processing {total} domain(s) [2 requests per URL]...")
+    print(f"Supported CDNs: Incapsula, Akamai, Fastly, Cloudflare, Varnish")
+    print(f"Saving results to: {output_file}\n")
 
     with open(output_file, "w", encoding="utf-8") as out:
-        out.write("HTTP Headers Inspector - Deteccion de cache HIT\n")
-        out.write(f"Generado : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        out.write(f"Dominios : {total}\n")
+        out.write("HTTP Headers Inspector - Detection de cache HIT\n")
+        out.write(f"Generated : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        out.write(f"Domains : {total}\n")
         out.write(f"CDNs     : Incapsula, Akamai, Fastly, Cloudflare, Varnish\n")
         out.write(f"{'#'*62}\n")
 
@@ -219,15 +219,15 @@ def process_file(input_file: str, output_file: str) -> None:
                 out.write("\n")
             else:
                 misses += 1
-                print("")  # salto de línea limpio, sin "MISS"
+                print("")  # clean line break without printing "MISS"
 
-    # Resumen al final del fichero
+    # Summary
     summary = (
         f"\n\n{'#'*62}\n"
-        f"RESUMEN\n"
-        f"  Total procesados : {total}\n"
+        f"SUMMARY\n"
+        f"  Total processed : {total}\n"
         f"  HIT  (cacheable) : {hits}\n"
-        f"  MISS (no cachea) : {misses}\n"
+        f"  MISS (not cached) : {misses}\n"
         f"{'#'*62}\n"
     )
     with open(output_file, "a", encoding="utf-8") as out:
@@ -235,7 +235,7 @@ def process_file(input_file: str, output_file: str) -> None:
 
     print(f"\n{'─'*42}")
     print(f"  Total: {total}  |  HIT: {hits}  |  MISS: {misses}")
-    print(f"Resultados guardados en '{output_file}'")
+    print(f"Results saved to '{output_file}'")
 
 
 if __name__ == "__main__":
