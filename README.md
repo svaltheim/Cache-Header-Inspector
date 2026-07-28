@@ -22,4 +22,4 @@ Features
 ✔ No external dependencies
 
 
-Usage: python cacheheader_inspector.py <domains_file> [output_file]
+# Usage: python cacheheader_inspector.py <domains_file> [output_file]
