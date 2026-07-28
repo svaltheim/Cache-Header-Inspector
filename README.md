@@ -27,5 +27,11 @@ Features
 
 Examples
 
-<img width="1929" height="1156" alt="image" src="https://github.com/user-attachments/assets/68e47538-25b0-42d9-b9ff-0a7d52a7f16d" />
+
+<img width="1944" height="1276" alt="image" src="https://github.com/user-attachments/assets/76d71fce-f185-4fd7-aac8-bb43ac2cc6c7" />
+
+<img width="2560" height="1665" alt="image" src="https://github.com/user-attachments/assets/95d11107-753a-49a5-9acd-655c0d3a46ec" />
+
+
+
 
