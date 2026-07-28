@@ -25,12 +25,14 @@ Features
 ```Usage: python cacheheader_inspector.py <domains_file> [output_file]```
 
 
-Example
+
+**Example**
 
 <img width="2237" height="1825" alt="image" src="https://github.com/user-attachments/assets/1f97d5eb-4a7b-4dd2-8031-32fbcb3eced6" />
 
+****************************************************************************************************************************************************
 
-Working
+**Working**
 
 <img width="1058" height="1043" alt="image" src="https://github.com/user-attachments/assets/3cff15a1-ad51-43eb-b674-26a8241644ff" />
 
