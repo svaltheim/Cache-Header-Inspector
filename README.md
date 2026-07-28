@@ -20,3 +20,6 @@ Features
 ✔ Redirect detection
 ✔ Summary statistics
 ✔ No external dependencies
+
+
+Usage: python cacheheader_inspector.py <domains_file> [output_file]
