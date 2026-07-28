@@ -25,7 +25,7 @@ Features
 **Usage: python cacheheader_inspector.py <domains_file> [output_file]**
 
 
-[!NOTE]
+!NOTE
 Example
 
 <img width="2237" height="1825" alt="image" src="https://github.com/user-attachments/assets/1f97d5eb-4a7b-4dd2-8031-32fbcb3eced6" />
