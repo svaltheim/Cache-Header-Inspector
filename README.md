@@ -1,5 +1,6 @@
 # Cache-Header-Inspector
-![Python](https://img.shields.io/badge/python-3.x-blue.svg)
+![Python](https://img.shields.io/badge/python-3.x-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 
 A lightweight Python tool designed for Bug Bounty hunters to identify cacheable endpoints by inspecting HTTP response headers.
 
