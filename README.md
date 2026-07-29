@@ -48,7 +48,7 @@ Features
 
 > [!NOTE]
    > git clone [https://github.com/svaltheim/Cache-Header-Inspector.git](https://github.com/svaltheim/Cache-Header-Inspector.git)
-   > cd Cache-Header-Inspector >
+   > cd Cache-Header-Inspector 
 
 
 
