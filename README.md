@@ -49,7 +49,7 @@ Features
 1. Clone the repository:
    ```bash
    git clone [https://github.com/svaltheim/Cache-Header-Inspector.git](https://github.com/svaltheim/Cache-Header-Inspector.git)
-   cd Cache-Header-Inspector ``
+   cd Cache-Header-Inspector ```
 
 
 
