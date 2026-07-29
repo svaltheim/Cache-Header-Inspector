@@ -46,9 +46,10 @@ Features
 
 ## Installation
 
-> [!NOTE]
-   > git clone [https://github.com/svaltheim/Cache-Header-Inspector.git](https://github.com/svaltheim/Cache-Header-Inspector.git)
-   > cd Cache-Header-Inspector 
+````
+    git clone [https://github.com/svaltheim/Cache-Header-Inspector.git](https://github.com/svaltheim/Cache-Header-Inspector.git)
+    cd Cache-Header-Inspector
+````
 
 
 
